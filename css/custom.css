@@ -1,0 +1,60 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    vertical-align: top;
+    font-family: 'Droid Sans', sans-serif;
+    font-size: 14px;
+}
+/* Main */
+body {
+    margin: 0;
+    padding: 0;
+    line-height: 2em;
+    background: #FCFCFC
+}
+header {
+    width: 100%;
+    background-color: #FFF;
+    border-bottom: 3px solid #CCC;
+}
+nav {
+    margin: 0 auto;
+    padding: 0 15px;
+    font-size: 13px;
+    max-width: 55%;
+    overflow-y: auto;
+}
+nav::after {
+    clear: both;
+}
+.logo h1 {
+    height: 30px;
+    float: left;
+    font-size: 13px;
+}
+.logo {
+    float: left;
+    display: block;
+}
+.logo-icon {
+    height: 30px;
+    float: left;
+    text-align: center;
+    font-size: 13px;
+}
+#content {
+    float: none;
+    margin: 0 auto;
+    width: 55%;
+}
+.container {
+    text-align: center;
+    margin-top: 2em;
+}
+
+/* CodeMirror */
+.CodeMirror {
+    border: 1px solid #CCC;
+    text-align: left;
+}

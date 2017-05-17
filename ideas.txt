@@ -1,0 +1,2 @@
+Parse user input and ask them to confirm that it has been parsed correctly. Also give them the ability to edit it
+Parse the data when it's dropped/copied and let user know that data is valid. Maybe ask some questions about the format as well

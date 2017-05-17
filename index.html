@@ -5,13 +5,14 @@
     <meta charset="UTF-8">
     <meta name="description" content="">
     <meta name="author" content="">
+    <link rel="icon" href="media/favicon.ico" type="image/x-icon">
 
     <title>UX Visualiser</title>
 
     <link href="https://fonts.googleapis.com/css?family=Droid+Sans" rel="stylesheet">
-    <link href="css/custom.css" rel="stylesheet">
     <link href="css/codemirror.css" rel="stylesheet">
     <link href="css/c3.min.css" rel="stylesheet">
+    <link href="css/custom.css" rel="stylesheet">
     <!-- Custom CSS -->
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -26,29 +27,36 @@
 <body>
     <header>
         <nav>
-            <div class="logo-icon">LOGO</div>
+            <div class="logo-icon"><img src="media/logo.png" /></div>
             <div class="logo">
-                <h1>User experience visualizer</h1>
+                <h1>User experience data visualizer</h1>
             </div>
         </nav>
-
     </header>
     <div class="container">
         <div id="content">
-            <div>
-                <form name="codeMirrorMain" class="box" method="post" action="" enctype="multipart/form-data">
-                </form>
+            <select id="dataType">
+                <option value="1">Completion time</option>
+                <option value="2">Success Rate</option>
+                <option value="3">Average Errors</option>
+                <option value="4">Error Rate</option>
+                <option value="5">Confusion matrix</option>
+            </select>
+            <div id="codeMirrorMain">
             </div>
+            <div>
+                <button class="visualize-btn">Visualize</button>
+            </div>
+            <div id="chart"></div>
         </div>
     </div>
-    <div id="chart"></div>
-    <!-- jQuery -->
     <script src="js/lib/jquery.js"></script>
+    <script src="js/lib/lodash.js"></script>
     <script src="js/lib/modernizr.min.js"></script>
     <script src="js/lib/codemirror.js"></script>
     <script src="js/lib/papaparse.min.js"></script>
-    <script src="js/lib/d3.js"></script>
-    <script src="js/lib/c3.min.js"></script>
+    <script src="plotly.min.js"></script>
+    <script src="js/functions.js"></script>
     <script src="js/main.js"></script>
 </body>
 

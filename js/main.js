@@ -186,6 +186,8 @@ var UXVisualiser = {
 
                 Plotly.newPlot('chart', data);
             }
+
+
         };
         Papa.parse(csv, this.papaOptions);
     },
@@ -223,10 +225,10 @@ var UXVisualiser = {
         var selected = $('#dataType').find(':selected').val();
         switch (selected) {
             case "1":
-                this.test();
+                this.completionTime();
                 break;
             case "2":
-                this.successRate();
+                this.test();
                 break;
             case "3":
                 break;

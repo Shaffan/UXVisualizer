@@ -6,18 +6,23 @@
     font-family: 'Droid Sans', sans-serif;
     font-size: 14px;
 }
+
+
 /* Main */
+
 body {
     margin: 0;
     padding: 0;
     line-height: 2em;
     background: #FCFCFC
 }
+
 header {
     width: 100%;
     background-color: #FFF;
     border-bottom: 3px solid #CCC;
 }
+
 nav {
     margin: 0 auto;
     padding: 0 15px;
@@ -26,57 +31,162 @@ nav {
     overflow-y: auto;
     box-sizing: content-box;
 }
+
 nav::after {
     clear: both;
 }
+
 .logo h1 {
     height: 50px;
     float: left;
     font-size: 13px;
 }
+
 .logo {
     float: left;
     display: block;
 }
+
 .logo-icon {
     height: 50px;
     float: left;
     text-align: center;
     font-size: 13px;
 }
+
 .logo-icon img {
     max-height: 50px;
 }
+
 #content {
     float: none;
     margin: 0 auto;
-    width: 50%;
+    width: 60%;
 }
+
 .container {
     text-align: center;
     margin-top: 2em;
 }
+
 .visualize-btn {
+    display: none;
     float: left;
     margin-top: 1em;
 }
 
+.button-div {
+    display: none;
+}
+
+.toggle {
+    width: 24.5%;
+    font-size: 10px;
+    text-align: center;
+    padding: 0;
+}
+
+/* Drag and drop curtesy of https://css-tricks.com/drag-and-drop-file-uploading/*/
+
+.box {
+    background-color: #cccccc;
+    padding: 50px 20px 100px 20px;
+    color: grey;
+}
+
+.file_select {
+    color: black;
+    text-decoration: underline;
+}
+
+.upload_icon {
+    padding: 30px 20px;
+    opacity: 0.6;
+}
+
+.or {
+    font-weight: 600;
+}
+
+.box__dragndrop, .box__uploading, .box__success, .box__error, .or {
+    display: none;
+    font-size: 16px;
+}
+
+.box.has-advanced-upload {
+    outline: 4px dashed grey;
+    outline-offset: -10px;
+}
+
+.box.has-advanced-upload .box__dragndrop {
+    display: inline;
+}
+
+.or.has-advanced-upload {
+    display: inline;
+}
+
+.box.is-dragover {
+    background-color: white;
+}
+
+/* Found at https://tympanus.net/codrops/2015/09/15/styling-customizing-file-inputs-smart-way/ */
+
+.box__file {
+    width: 0.1px;
+    height: 0.1px;
+    opacity: 0;
+    overflow: hidden;
+    position: absolute;
+    z-index: -1;
+}
+
+.box__file + label {
+    font-size: 1.25em;
+    font-weight: 700;
+    display: inline-block;
+    padding: 0 5px 0 5px;
+}
+
+.box__file:focus + label,
+.box__file + label:hover {
+    color: brown;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+
+}
+
+.box__file + label {
+	cursor: pointer; /* "hand" cursor */
+}
+
+.box__file:focus + label {
+	outline: 1px dotted #000;
+	outline: -webkit-focus-ring-color auto 5px;
+}
+
 /* CodeMirror */
+
 .CMContainer {
     margin: 0 auto;
-    width: 50%;
 }
+
 .CodeMirror {
     border: 1px solid #CCC;
     text-align: left;
 }
+
 /* Graph */
+
 .c3 {
     margin-top: 4em
 }
+
 .mean-line {
     stroke-width: 1px;
 }
+
 .mean-line line {
     stroke: red;
 }

@@ -23,9 +23,9 @@ var functions = {
             seconds = /([0-9]+\.?[0-9]*)\s?(seconds|secs?|s\s?)/i,
             numbers = /[0-9]+\.?[0-9]*/i;
 
-            var minutes = minutes.exec(value);
-            var seconds = seconds.exec(value);
-            var numbers = numbers.exec(value);
+        var minutes = minutes.exec(value);
+        var seconds = seconds.exec(value);
+        var numbers = numbers.exec(value);
 
         return {
             isMatch: minutes !== null || seconds !== null || numbers !== null,
@@ -33,5 +33,10 @@ var functions = {
             seconds: seconds,
             numbers: numbers
         };
-    }
+    },
+    // Found at https://css-tricks.com/drag-and-drop-file-uploading/
+    isAdvancedUpload: function() {
+        var div = document.createElement('div');
+        return (('draggable' in div) || ('ondragstart' in div && 'ondrop' in div)) && 'FormData' in window && 'FileReader' in window;
+    },
 };

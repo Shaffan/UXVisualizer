@@ -2,6 +2,7 @@
 var UXVisualiser = {
     papaOptions: null,
     $codeMirror: null,
+    lastOp: null,
 
     completionTime: function() {
         var self = this;
@@ -111,7 +112,7 @@ var UXVisualiser = {
                 if (!functions.matchTime(val[0]).isMatch) {
                     heading = val.shift(0);
                 }
-                headings[index]= (heading || 'Data ' + dataCounter);
+                headings[index] = (heading || 'Data ' + dataCounter);
 
                 // calculate means
                 totals[index] = _.reduce(val, function(sum, n) {
@@ -168,12 +169,6 @@ var UXVisualiser = {
                 // isolate and remove group-names
                 var groups = zipped.shift(0);
 
-                /*_.each(zipped, function(val, index) {
-                    totals[index] = _.reduce(val, function(sum, n) {
-                        return sum + +n;
-                    }, 0);
-                });*/
-
                 headings.shift(0);
                 _.each(zipped, function(val, index) {
                     data.push({
@@ -194,16 +189,24 @@ var UXVisualiser = {
 
     init: function() {
         var self = this;
-        $(".visualize-btn").click(function() {
-            self.buttonClicked();
-        });
 
+        self.initFileSubmit();
+        self.initButtons();
+
+        // move to initCodeMirror
         var codeContainer = $("#codeMirrorMain")[0];
         this.$codeMirror = CodeMirror(codeContainer, {
             mode: 'text/plain',
-            lineNumbers: true
+            lineNumbers: true,
         });
+        this.$codeMirror.on("change", function(cm, change) {
+            self.buttonClicked({
+                id: self.lastOp
+            });
+        });
+        $(this.$codeMirror.getWrapperElement()).hide();
 
+        // TODO: possibly move to config file if the need arises
         this.papaOptions = {
             delimeter: ',', // IDEA: give option to set delimeter
             newline: '',
@@ -219,28 +222,110 @@ var UXVisualiser = {
             download: false,
             skipEmptyLines: true
         };
+
+        console.log('UXVisualiser: initialised');
     },
 
-    buttonClicked: function() {
+    initButtons: function() {
+        var self = this;
+
+        $(".toggle").click(function() {
+            self.buttonClicked(this)
+        });
+
         var selected = $('#dataType').find(':selected').val();
-        switch (selected) {
-            case "1":
-                this.completionTime();
+
+    },
+
+    buttonClicked: function(caller) {
+        var self = this;
+
+        // If the button was actually clicked toggle the classes; otherwise it is redoing the previous operation and do nothing
+        if (caller.nodeType === 1) {
+            $(".toggle").removeClass('button-primary');
+            $(caller).addClass('button-primary');
+        }
+        self.lastOp = caller.id;
+
+        switch (caller.id) {
+            case "ct":
+                self.completionTime();
                 break;
-            case "2":
-                this.test();
+            case "ser":
+                self.test();
                 break;
-            case "3":
+            case "ae":
                 break;
-            case "4":
-                break;
-            case "5":
+            case "cf":
                 break;
             default:
                 console.log("No data type selected");
                 break;
         };
-    }
+    },
+
+    // Curtesy of https://css-tricks.com/drag-and-drop-file-uploading/
+    initFileSubmit: function() {
+        var self = this;
+        var $form = $('.box');
+        var droppedFiles = false;
+
+        if (functions.isAdvancedUpload()) {
+            $form.addClass('has-advanced-upload');
+            $('.box__dragndrop').addClass('has-advanced-upload');
+
+            $(".container").on('drag dragstart dragend dragover dragenter dragleave drop', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                })
+                .on('dragover dragenter', function() {
+                    $form.addClass('is-dragover');
+                })
+                .on('dragleave dragend drop', function() {
+                    $form.removeClass('is-dragover');
+                })
+                .on('drop', function(e) {
+                    reset();
+                    droppedFiles = e.originalEvent.dataTransfer.files;
+                    fileToCodeMirror(droppedFiles[0]);
+                });
+        };
+
+        $('#file').change(function() {
+            reset();
+            var submittedFile = this.files[0];
+            fileToCodeMirror(submittedFile);
+        });
+
+        function fileToCodeMirror(file) {
+            if (config.ALLOWED_FILETYPES.indexOf(file.type) !== -1) {
+                var csv;
+                self.papaOptions.complete = function(results, file) {
+                    csv = _.reduce(results.data, function(sum, n) {
+                        return sum + n + "\n";
+                    }, "");
+                    self.$codeMirror.doc.setValue(csv);
+                };
+                Papa.parse(file, self.papaOptions);
+                fileSubmitted();
+            } else {
+                window.alert('Unsupported file type');
+                // add message to user - make error div visible etc
+            }
+        };
+
+        function fileSubmitted() {
+            $(self.$codeMirror.getWrapperElement()).show();
+            $('.box').hide();
+            $('.button-div').show();
+        };
+
+        function reset() {
+            self.$codeMirror.doc.setValue('');
+            Plotly.purge('chart');
+            $(".toggle").removeClass('button-primary');
+        };
+    },
 };
 
 (function() {

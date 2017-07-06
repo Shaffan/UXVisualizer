@@ -7,11 +7,16 @@
     font-size: 14px;
 }
 
+html {
+    position: relative;
+    min-height: 100%;
+}
+
 
 /* Main */
 
 body {
-    margin: 0;
+    margin: 0 0 100px;
     padding: 0;
     line-height: 2em;
     background: #FCFCFC
@@ -27,9 +32,79 @@ nav {
     margin: 0 auto;
     padding: 0 15px;
     font-size: 13px;
-    max-width: 50%;
+    max-width: 80%;
     overflow-y: auto;
     box-sizing: content-box;
+}
+
+nav ul {
+    list-style: none;
+    margin-bottom: 0;
+    float: right;
+    overflow: hidden;
+}
+
+li {
+    float: left;
+    width: 4em;
+    margin-bottom: 0;
+    text-align: right;
+    margin-right: 3px;
+}
+
+li a {
+    text-decoration: none;
+    color: inherit;
+    line-height: 3.5em;
+    letter-spacing: 0.5px;
+    font-weight: 500;
+}
+
+li a:hover {
+    color: #9DB4FF;
+}
+
+.footer {
+    height: 70px;
+    text-align: center;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    overflow:hidden;
+    margin-bottom: 5px;
+}
+
+.footer .fa {
+    display: inline-block;
+    vertical-align: middle;
+    font-size: 1.5em;
+}
+
+.github a {
+    text-decoration: none;
+}
+
+.footer-nav {
+    text-align: center;
+}
+
+.footer-nav ul {
+    float: none;
+    width: 13%;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.footer-nav li {
+    width: auto;
+    display: inline;
+    margin-right: 3px;
+}
+
+.footer-nav li a {
+    line-height: inherit;
+    text-decoration: underline;
 }
 
 nav::after {
@@ -37,7 +112,6 @@ nav::after {
 }
 
 .logo h1 {
-    height: 50px;
     float: left;
     font-size: 13px;
 }
@@ -61,7 +135,7 @@ nav::after {
 #content {
     float: none;
     margin: 0 auto;
-    width: 60%;
+    width: 100%;
 }
 
 .container {
@@ -69,14 +143,9 @@ nav::after {
     margin-top: 2em;
 }
 
-.visualize-btn {
-    display: none;
-    float: left;
-    margin-top: 1em;
-}
-
-.button-div {
-    display: none;
+.button-wrapper {
+    margin-bottom: 20px;
+    visibility: hidden;
 }
 
 .toggle {
@@ -89,13 +158,13 @@ nav::after {
 /* Drag and drop curtesy of https://css-tricks.com/drag-and-drop-file-uploading/*/
 
 .box {
-    background-color: #cccccc;
-    padding: 50px 20px 100px 20px;
-    color: grey;
+    background-color: #9DB4FF;
+    padding: 100px 20px 150px 20px;
+    color: #586CAD;
 }
 
 .file_select {
-    color: black;
+    color: #07123A;
     text-decoration: underline;
 }
 
@@ -110,11 +179,11 @@ nav::after {
 
 .box__dragndrop, .box__uploading, .box__success, .box__error, .or {
     display: none;
-    font-size: 16px;
+    font-size: 20px;
 }
 
 .box.has-advanced-upload {
-    outline: 4px dashed grey;
+    outline: 4px dashed #586CAD;
     outline-offset: -10px;
 }
 
@@ -150,7 +219,7 @@ nav::after {
 
 .box__file:focus + label,
 .box__file + label:hover {
-    color: brown;
+    color: #FCFCFC;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
@@ -189,4 +258,47 @@ nav::after {
 
 .mean-line line {
     stroke: red;
+}
+
+/* Error div */
+
+.error-div {
+    background-color: #FF5C5C;
+    border-radius: 3px 3px 0 0;
+    display: none;
+}
+
+/* Media queries */
+
+@media (max-width:768px){
+    nav {
+        max-width: 100%;
+    }
+    .logo-icon {
+        text-align: left;
+        width: 50%;
+    }
+    .toggle {
+        width: 100%;
+    }
+    .button-wrapper {
+        display: none;
+    }
+    .footer-nav ul {
+        width: auto;
+    }
+    .footer-nav li {
+        float: none;
+    }
+    .file_select {
+        width: 100%;
+    }
+    .file_select strong {
+        font-size: 1.2em;
+    }
+}
+@media (min-width:1920px){
+    nav {
+        max-width: 50%;
+    }
 }

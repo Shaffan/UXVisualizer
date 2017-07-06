@@ -1,2 +1,5 @@
 add validation for data input (compare number of columns to headings etc)
+fix adding new files - done
 SET UP EXAMPLES - take screenshots in excel
+add nice error messages - done
+add contact

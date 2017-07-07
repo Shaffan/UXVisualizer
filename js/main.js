@@ -17,6 +17,14 @@ var UXVisualiser = {
             var layout = {
                 title: 'Average completion time',
                 hovermode: 'closest',
+                displayModeBar: true,
+                bargap : 0.01,
+                xaxis: {
+                    showgrid: false,
+                },
+                yaxis: {
+                    gridcolor: '#b3b3b3',
+                },
             };
 
             if (results.errors.length > 0) {
@@ -57,6 +65,7 @@ var UXVisualiser = {
                 data.push({
                     x: analysedData.tasks,
                     y: means,
+                    width: means.length / 10,
                     type: 'bar',
                     text: means,
                     textfont: {
@@ -69,9 +78,7 @@ var UXVisualiser = {
             });
 
             if (valid) {
-                Plotly.newPlot('chart', data, layout, {
-                    displayModeBar: true
-                });
+                Plotly.newPlot('chart', data, layout);
             } else {
                 functions.showError('Please ensure that the data contains no letters apart from the headings');
             }
@@ -98,6 +105,7 @@ var UXVisualiser = {
                 data.push({
                     x: analysedData.tasks,
                     y: means,
+                    width: means.length / 10,
                     type: 'bar',
                     text: means,
                     textfont: {
@@ -111,7 +119,14 @@ var UXVisualiser = {
             if (valid) {
                 Plotly.newPlot('chart', data, {
                     title: 'Average errors',
-                    displayModeBar: true
+                    displayModeBar: true,
+                    bargap : 0.01,
+                    xaxis: {
+                        showgrid: false,
+                    },
+                    yaxis: {
+                        gridcolor: '#b3b3b3',
+                    },
                 });
             } else {
                 functions.showError('Please ensure that the data contains no letters apart from the headings');
@@ -206,27 +221,32 @@ var UXVisualiser = {
                 title: chartTitle,
                 hovermode: 'closest',
                 xaxis: {
-                    autorange: true
+                    autorange: true,
+                    showgrid: false,
                 },
                 yaxis: {
-                    autorange: true
+                    autorange: true,
+                    gridcolor: '#b3b3b3',
                 },
-                shapes: []
+                bargap : 0.01,
             };
 
             var data = [];
-            data.push({
-                x: _.map(val, function(v, i) {
-                    return i + 1;
-                }),
-                y: val,
-                mode: 'markers',
-                type: 'scatter',
-                name: headings[index],
-                marker: {
-                    size: 8
-                }
+            _.each(zipped, function(val, index) {
+                data.push({
+                    x: _.map(val, function(v, i) {
+                        return i + 1;
+                    }),
+                    y: val,
+                    mode: 'markers',
+                    type: 'scatter',
+                    name: headings[index],
+                    marker: {
+                        size: 8
+                    }
+                });
             });
+
             if (showMean) {
                 _.each(parsedParsed, function(val, index) {
                     var meanLine = [];
@@ -263,12 +283,119 @@ var UXVisualiser = {
         var self = this;
         var csv = this.$codeMirror.doc.getValue();
         config.papaConfig.complete = function(results, file) {
+            var data = [];
+            var valid = true;
+            results.data.shift(0);
             // TODO: validation
 
             if (results.errors.length > 0) {
                 functions.handlePapaError(results.errors);
             }
 
+            var analysedData = functions.calcSuccessRate(results.data);
+            _.each(analysedData.results, function(rates, key) {
+                _.each(rates, function(v, i) {
+                    rates[i] = v + '%';
+                });
+                data.push({
+                    x: analysedData.tasks,
+                    y: rates,
+                    width: rates.length / 10,
+                    type: 'bar',
+                    text: rates,
+                    textfont: {
+                        color: 'black'
+                    },
+                    name: key,
+                    textposition: 'auto',
+                    hoverinfo: 'none',
+                });
+            });
+            if (valid) {
+                Plotly.newPlot('chart', data, {
+                    title: 'Success rate',
+                    displayModeBar: true,
+                    bargap : 0.01,
+                    xaxis: {
+                        showgrid: false,
+                    },
+                    yaxis: {
+                        gridcolor: '#b3b3b3',
+                    },
+                });
+            } else {
+                functions.showError('Please ensure that the data contains no letters apart from the headings');
+            }
+
+        };
+
+        if (csv !== '') {
+            Papa.parse(csv, config.papaConfig);
+        } else {
+            // change this
+            functions.showError('Please submit some data for the graph');
+        }
+    },
+
+    errorRate: function() {
+        var self = this;
+        var csv = this.$codeMirror.doc.getValue();
+
+        config.papaConfig.complete = function(results, file) {
+            var data = [];
+            var valid = true;
+            results.data.shift(0);
+
+            if (results.errors.length > 0) {
+                functions.handlePapaError(results.errors);
+            }
+
+            var analysedData = functions.calcErrorRate(results.data);
+            _.each(analysedData.results, function(rates, key) {
+                data.push({
+                    x: analysedData.tasks,
+                    y: rates,
+                    width: rates.length / 10,
+                    type: 'bar',
+                    text: rates,
+                    textfont: {
+                        color: 'black'
+                     },
+                    name: key,
+                    textposition: 'auto',
+                    hoverinfo: 'none',
+                });
+            });
+            if (valid) {
+                Plotly.newPlot('chart', data, {
+                    title: 'Error rate',
+                    displayModeBar: true,
+                    bargap : 0.01,
+                    xaxis: {
+                        showgrid: false,
+                    },
+                    yaxis: {
+                        gridcolor: '#b3b3b3',
+                    },
+                });
+            } else {
+                functions.showError('Please ensure that the data contains no letters apart from the headings');
+            }
+            // this.scatter('Average errors', true);
+        };
+
+        if (csv !== '') {
+            Papa.parse(csv, config.papaConfig);
+        } else {
+            // change this
+            functions.showError('Please submit some data for the graph');
+        }
+    },
+
+    successErrorComparison: function() {
+        var self = this;
+        var csv = this.$codeMirror.doc.getValue();
+        config.papaConfig.complete = function(results, file) {
             var means = [];
             var totals = [];
             var data = [];
@@ -297,6 +424,7 @@ var UXVisualiser = {
                     data.push({
                         x: groups,
                         y: val,
+                        width: groups.length / 10,
                         name: headings[index],
                         type: 'bar',
                     });
@@ -304,35 +432,13 @@ var UXVisualiser = {
 
                 if (valid) {
                     Plotly.newPlot('chart', data, {
-                        displayModeBar: true
-                    });
-                } else {
-                    functions.showError('Please ensure that the data contains no letters apart from the headings');
-                }
-            } else if (results.data[0].length > 3) {
-                var analysedData = functions.calcSuccessRate(results.data);
-
-                _.each(analysedData.results, function(rates, key) {
-                    _.each(rates, function(v, i) {
-                        rates[i] = v + '%';
-                    });
-                    data.push({
-                        x: analysedData.tasks,
-                        y: rates,
-                        type: 'bar',
-                        text: rates,
-                        textfont: {
-                            color: 'black'
-                         },
-                        name: key,
-                        textposition: 'auto',
-                        hoverinfo: 'none',
-                    });
-                });
-                if (valid) {
-                    Plotly.newPlot('chart', data, {
-                        title: 'Success rate',
-                        displayModeBar: true
+                        displayModeBar: true,
+                        xaxis: {
+                            showgrid: false,
+                        },
+                        yaxis: {
+                            gridcolor: '#b3b3b3',
+                        },
                     });
                 } else {
                     functions.showError('Please ensure that the data contains no letters apart from the headings');
@@ -340,7 +446,58 @@ var UXVisualiser = {
             } else {
                 self.scatter('', false);
             }
+        };
+        if (csv !== '') {
+            Papa.parse(csv, config.papaConfig);
+        } else {
+            // change this
+            functions.showError('Please submit some data for the graph');
         }
+    },
+
+    fMeasure: function() {
+        var self = this;
+        var csv = this.$codeMirror.doc.getValue();
+
+        config.papaConfig.complete = function(results, file) {
+            var data = [];
+            var valid = true;
+            // results.data.shift(0);
+
+            if (results.errors.length > 0) {
+                functions.handlePapaError(results.errors);
+            }
+
+            var analysedData = functions.calcFMeasure(results.data);
+            var xaxis = analysedData.data.shift(0);
+            _.each(analysedData.data, function(values, i) {
+                data.push({
+                    x: xaxis,
+                    y: values,
+                    mode: 'lines+markers',
+                    type: 'scatter',
+                    name: analysedData.headings[i],
+                    marker: {
+                        size: 8
+                    }
+                });
+            });
+            if (valid) {
+                Plotly.newPlot('chart', data, {
+                    title: 'F-Measure',
+                    displayModeBar: true,
+                    bargap : 0.01,
+                    xaxis: {
+                        showgrid: false,
+                    },
+                    yaxis: {
+                        gridcolor: '#b3b3b3',
+                    },
+                });
+            } else {
+                functions.showError('Please ensure that the data contains no letters apart from the headings');
+            }
+        };
 
         if (csv !== '') {
             Papa.parse(csv, config.papaConfig);
@@ -350,146 +507,54 @@ var UXVisualiser = {
         }
     },
 
-    confusionMatrix: function() {
+    recall: function() {
         var self = this;
         var csv = this.$codeMirror.doc.getValue();
+
         config.papaConfig.complete = function(results, file) {
             var data = [];
             var valid = true;
-            var datasetCounter;
-            var zippedParsed = [];
-            var parsedParsed = [];
-            // TODO: validation
+            // results.data.shift(0);
 
             if (results.errors.length > 0) {
                 functions.handlePapaError(results.errors);
             }
 
-            var layout = {
-                displayModeBar: true,
-                hovermode: 'closest',
-            };
 
-            var op = determineOp(results.data);
-            switch (op) {
-                case 1:
-                    compareSets();
-                    break;
-                case 2:
-                    compareUnknown();
-                    break;
-                default:
-                    recall();
-                    break;
-            };
+            var precisionRatings = functions.calcPrecision(results.data);
+            precisionRatings.data.shift(0);
+            var recalls = functions.calcRecall(results.data);
+            recalls.data.shift(0);
 
-            function compareSets() {
-                // isolate and remove headings
-                var headings = results.data.shift(0);
-                var groups = [];
-
-                _.each(results.data, function(val, index) {
-                    if (val[0] === '') {
-                        datasetCounter = (typeof datasetCounter !== 'undefined') ? datasetCounter + 1 : 0;
-                        if (val[1] === '') {
-                            functions.showError('Failed to distinguish dataset name. Please consult the examples page to ensure you are using the correct format for this graph.');
-                        }
-                        groups.push(val[1]);
-                        parsedParsed[datasetCounter] = [];
-                    } else {
-                        if (parsedParsed[datasetCounter]) {
-                            parsedParsed[datasetCounter].push(val);
-                        } else {
-                            functions.showError('Encountered unexpected error while parsing your data. Please contact the developer');
-                        }
+            _.each(precisionRatings.data, function(val, i) {
+                data.push({
+                    x: recalls.data[i],
+                    y: precisionRatings.data[i],
+                    mode: 'lines+markers',
+                    type: 'scatter',
+                    name: precisionRatings.headings[i],
+                    marker: {
+                        size: 8
                     }
                 });
-
-                _.each(parsedParsed, function(val, index) {
-                    zippedParsed.push(_.zip.apply(_, val));
-                });
-
-                _.each(zippedParsed, function(val, index) {
-                    data.push({
-                        x: val[0],
-                        y: val[1],
-                        name: headings[1] + ' (' + groups[index] + ')',
-                        type: 'markers',
-                    });
-                    data.push({
-                        x: val[0],
-                        y: val[2],
-                        name: headings[2] + ' (' + groups[index] + ')',
-                        type: 'markers',
-                    });
-                });
-            };
-            // TODO: rename later
-            function compareUnknown() {
-
-                // isolate and remove headings
-                var headings = results.data.shift(0);
-
-                var zipped = _.zip.apply(_, results.data);
-                _.each(zipped, function(val, index) {
-                    _.each(val, function(v, i) {
-                        // check if values - apart from headings - contain letters
-                        if (index > 0 && v.match(/[a-z]/i)) {
-                            valid = false;
-                        }
-                    });
-                });
-
-                headings.shift(0);
-                var xAxis = zipped.shift(0);
-                _.each(zipped, function(val, index) {
-                    data.push({
-                        x: xAxis,
-                        y: val,
-                        name: headings[index],
-                        type: 'line'
-                    });
-                });
-            }
-
-            function recall() {
-                layout.title = 'Recall';
-                // isolate and remove headings
-                var headings = results.data.shift(0);
-
-                var zipped = _.zip.apply(_, results.data);
-                _.each(zipped, function(val, index) {
-                    _.each(val, function(v, i) {
-                        // check if values - apart from headings - contain letters
-                        if (index > 0 && v.match(/[a-z]/i)) {
-                            valid = false;
-                        }
-                    });
-                });
-
-                headings.shift(0);
-                data.push({
-                    x: zipped[1],
-                    y: zipped[0],
-                    name: 'Recall',
-                    type: 'lines'
-                })
-            }
+            });
 
             if (valid) {
-                Plotly.newPlot('chart', data, layout);
+                Plotly.newPlot('chart', data, {
+                    title: 'Recall',
+                    displayModeBar: true,
+                    bargap : 0.01,
+                    xaxis: {
+                        showgrid: false,
+                    },
+                    yaxis: {
+                        gridcolor: '#b3b3b3',
+                        nticks: 10,
+                        range: [0, 1]
+                    },
+                });
             } else {
                 functions.showError('Please ensure that the data contains no letters apart from the headings');
-            }
-        }
-        // determine which graph to generate based on data format
-        function determineOp(data) {
-            if (data[1][0] === '') {
-                return 1;
-            } else if (data[0][0] === '') {
-                return 2;
-            } else {
-                return 3;
             }
         };
 
@@ -498,7 +563,74 @@ var UXVisualiser = {
         } else {
             // change this
             functions.showError('Please submit some data for the graph');
+        }
+    },
+
+    precisionFPRComparison: function() {
+        var self = this;
+        var csv = this.$codeMirror.doc.getValue();
+
+        config.papaConfig.complete = function(results, file) {
+            var data = [];
+            var valid = true;
+            // results.data.shift(0);
+
+            if (results.errors.length > 0) {
+                functions.handlePapaError(results.errors);
+            }
+
+
+            var precisionRatings = functions.calcPrecision(results.data);
+            _.each(precisionRatings.headings, function(v, i) {
+                precisionRatings.headings[i] = 'Precision ' + '(' + v + ')'
+            });
+            var xaxis = precisionRatings.data.shift(0);
+            var fpRatings = functions.calcFPR(results.data);
+            fpRatings.data.shift(0);
+
+            var analysedData = {
+                data: null,
+                headings: null
+            };
+            analysedData.data = precisionRatings.data.concat(fpRatings.data);
+            analysedData.headings = precisionRatings.headings.concat(fpRatings.headings);
+            _.each(analysedData.data, function(values, i) {
+                data.push({
+                    x: xaxis,
+                    y: values,
+                    mode: 'lines',
+                    type: 'scatter',
+                    name: analysedData.headings[i],
+                    marker: {
+                        size: 8
+                    }
+                });
+            });
+            if (valid) {
+                Plotly.newPlot('chart', data, {
+                    title: 'F-Measure',
+                    displayModeBar: true,
+                    bargap : 0.01,
+                    xaxis: {
+                        showgrid: false,
+                    },
+                    yaxis: {
+                        gridcolor: '#b3b3b3',
+                        nticks: 10,
+                        range: [0, 1]
+                    },
+                });
+            } else {
+                functions.showError('Please ensure that the data contains no letters apart from the headings');
+            }
         };
+
+        if (csv !== '') {
+            Papa.parse(csv, config.papaConfig);
+        } else {
+            // change this
+            functions.showError('Please submit some data for the graph');
+        }
     },
 
     buttonClicked: function(caller) {
@@ -519,14 +651,26 @@ var UXVisualiser = {
             case "ct":
                 self.completionTime();
                 break;
-            case "ser":
+            case "sr":
                 self.successRate();
+                break;
+            case "er":
+                self.errorRate();
                 break;
             case "ae":
                 self.averageErrors();
                 break;
-            case "cf":
-                self.confusionMatrix();
+            case "serc":
+                self.successErrorComparison();
+                break;
+            case "fm":
+                self.fMeasure();
+                break;
+            case "rc":
+                self.recall();
+                break;
+            case "pfc":
+                self.precisionFPRComparison();
                 break;
             default:
                 console.log("No data type selected");

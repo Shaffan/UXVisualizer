@@ -154,6 +154,38 @@ var functions = {
             tasks: tasks
         };
     },
+    calcErrorRate: function(data) {
+        var self = this;
+        var analysed = this.analyseData(data);
+        var sites = analysed.sites;
+        var tasks = analysed.tasks;
+        var sorted = analysed.data;
+
+        var errorRates = {};
+        _.each(sorted, function(val, i) {
+            _.each(val, function(v, j) {
+                var cumulativeEr = 0;
+                _.each(v[2], function(c, k) {
+                    cumulativeEr += ((c - v[5][k]) / c);
+                });
+                if (typeof errorRates[sites[i]] === 'undefined') {
+                    errorRates[sites[i]] = []
+                }
+                var len = v[5].length;
+                var er = ((cumulativeEr / len) * 100).toFixed(2);
+                errorRates[sites[i]].push(er);
+            });
+        });
+
+        _.each(tasks, function(v, i) {
+            tasks[i] = 'Task ' + v;
+        });
+
+        return {
+            results: errorRates,
+            tasks: tasks
+        };
+    },
     calcAverageErrors: function(data) {
         var self = this;
         var analysed = this.analyseData(data);
@@ -188,6 +220,138 @@ var functions = {
             results: averageErrors,
             tasks: tasks
         };
-    }
+    },
+    calcFMeasure: function(data) {
+        var headings = [];
+        var arrayNum = 0;
+        var buildingXAxis = true;
+        // first array is graph xaxis, second contains corresponding fmeasure
+        var fmeasures = [[]];
+        for (var i = 0; i < data.length; i += 3) {
+            var heading = data[i][0];
+            if (heading !== '') {
+                headings.push(heading);
+                arrayNum += 1;
+                fmeasures.push([]);
+                if (i > 0) {
+                    buildingXAxis = false;
+                }
+            }
+            var xaxisValue = data[i][1],
+                tp = +data[i+1][1],
+                fp = +data[i+2][1],
+                fn = +data[i+1][2];
 
+            if (buildingXAxis) {
+                fmeasures[0].push(xaxisValue);
+            }
+            var fm = ((tp * 2) / (tp * 2 + fp + fn)).toFixed(9);
+            fmeasures[arrayNum].push(fm);
+        }
+
+        return {
+            headings: headings,
+            data: fmeasures
+        }
+    },
+    calcPrecision: function(data) {
+        var headings = [];
+        var arrayNum = 0;
+        var buildingXAxis = true;
+        // first array is graph xaxis, second contains corresponding precision rating
+        var precisions = [[]];
+        for (var i = 0; i < data.length; i += 3) {
+            var heading = data[i][0];
+            if (heading !== '') {
+                headings.push(heading);
+                arrayNum += 1;
+                precisions.push([]);
+                if (i > 0) {
+                    buildingXAxis = false;
+                }
+            }
+            var xaxisValue = data[i][1],
+                tp = +data[i+1][1],
+                fp = +data[i+2][1],
+                fn = +data[i+1][2];
+
+            if (buildingXAxis) {
+                precisions[0].push(xaxisValue);
+            }
+            var precision = (tp / (tp + fp)).toFixed(9);
+            precisions[arrayNum].push(precision);
+        }
+
+        return {
+            headings: headings,
+            data: precisions
+        }
+    },
+    calcRecall: function(data) {
+        var headings = [];
+        var arrayNum = 0;
+        var buildingXAxis = true;
+        // first array is graph xaxis, second contains corresponding precision rating
+        var recalls = [[]];
+        for (var i = 0; i < data.length; i += 3) {
+            var heading = data[i][0];
+            if (heading !== '') {
+                headings.push(heading);
+                arrayNum += 1;
+                recalls.push([]);
+                if (i > 0) {
+                    buildingXAxis = false;
+                }
+            }
+            var xaxisValue = data[i][1],
+                tp = +data[i+1][1],
+                fp = +data[i+2][1],
+                fn = +data[i+1][2];
+
+            if (buildingXAxis) {
+                recalls[0].push(xaxisValue);
+            }
+            var rc = (tp / (tp + fn)).toFixed(9);
+            recalls[arrayNum].push(rc);
+        }
+
+        return {
+            headings: headings,
+            data: recalls
+        }
+    },
+    calcFPR: function(data) {
+        var headings = [];
+        var arrayNum = 0;
+        var buildingXAxis = true;
+        // first array is graph xaxis, second contains corresponding fp rating
+        var falsepositives = [[]];
+        for (var i = 0; i < data.length; i += 3) {
+            var heading = data[i][0];
+            if (heading !== '') {
+                headings.push('FPR ' + '(' + heading + ')');
+                arrayNum += 1;
+                falsepositives.push([]);
+                if (i > 0) {
+                    buildingXAxis = false;
+                }
+            }
+            var xaxisValue = data[i][1],
+                tp = +data[i+1][1],
+                fp = +data[i+2][1],
+                fn = +data[i+1][2];
+                tn = +data[i+2][2];
+
+            if (buildingXAxis) {
+                falsepositives[0].push(xaxisValue);
+            }
+            var fpr = (fp / (fp + tn)).toFixed(9);
+            falsepositives[arrayNum].push(fpr);
+        }
+
+        return {
+            headings: headings,
+            data: falsepositives
+        }
+    },
 };

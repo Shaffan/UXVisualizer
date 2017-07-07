@@ -10,7 +10,6 @@ var UXVisualiser = {
             var totals = [];
             var means = [];
             var dataCounter = 0;
-            var valid = true;
             var analysedData = {
                 results: {}
             };
@@ -77,11 +76,7 @@ var UXVisualiser = {
                 });
             });
 
-            if (valid) {
-                Plotly.newPlot('chart', data, layout);
-            } else {
-                functions.showError('Please ensure that the data contains no letters apart from the headings');
-            }
+            Plotly.newPlot('chart', data, layout);
         };
         if (csv !== '') {
             Papa.parse(csv, config.papaConfig);
@@ -116,7 +111,7 @@ var UXVisualiser = {
                     hoverinfo: 'none',
                 });
             });
-            if (valid) {
+            if (analysedData.valid) {
                 Plotly.newPlot('chart', data, {
                     title: 'Average errors',
                     displayModeBar: true,
@@ -146,7 +141,6 @@ var UXVisualiser = {
         showMean = (typeof showMean === 'undefined') ? true : showMean;
         parseForTime = (typeof parseForTime === 'undefined') ? false : parseForTime;
         chartTitle = (typeof chartTitle === 'undefined') ? '' : chartTitle;
-
 
         var self = this;
         var csv = this.$codeMirror.doc.getValue();
@@ -284,7 +278,6 @@ var UXVisualiser = {
         var csv = this.$codeMirror.doc.getValue();
         config.papaConfig.complete = function(results, file) {
             var data = [];
-            var valid = true;
             results.data.shift(0);
             // TODO: validation
 
@@ -311,7 +304,7 @@ var UXVisualiser = {
                     hoverinfo: 'none',
                 });
             });
-            if (valid) {
+            if (analysedData.valid) {
                 Plotly.newPlot('chart', data, {
                     title: 'Success rate',
                     displayModeBar: true,
@@ -343,7 +336,6 @@ var UXVisualiser = {
 
         config.papaConfig.complete = function(results, file) {
             var data = [];
-            var valid = true;
             results.data.shift(0);
 
             if (results.errors.length > 0) {
@@ -366,7 +358,7 @@ var UXVisualiser = {
                     hoverinfo: 'none',
                 });
             });
-            if (valid) {
+            if (analysedData.valid) {
                 Plotly.newPlot('chart', data, {
                     title: 'Error rate',
                     displayModeBar: true,
@@ -399,7 +391,6 @@ var UXVisualiser = {
             var means = [];
             var totals = [];
             var data = [];
-            var valid = true;
 
             // isolate and remove headings
             var headings = results.data.shift(0);
@@ -430,7 +421,7 @@ var UXVisualiser = {
                     });
                 });
 
-                if (valid) {
+                if (analysedData.valid) {
                     Plotly.newPlot('chart', data, {
                         displayModeBar: true,
                         xaxis: {
@@ -676,6 +667,8 @@ var UXVisualiser = {
                 console.log("No data type selected");
                 break;
         };
+
+        document.getElementById('chart').scrollIntoView()
     },
 
     init: function() {

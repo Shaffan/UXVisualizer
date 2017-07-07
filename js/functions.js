@@ -56,7 +56,13 @@ var functions = {
         var sites = [];
         var tasks = [];
         var sorted = [];
+        var valid = true;
         _.each(data, function(val, index) {
+            _.each(val, function(v, i) {
+                if (i > 0 && v.match(/[a-z]/i)) {
+                    valid = false;
+                }
+            });
             var i = sites.indexOf(val[0]);
             var j = tasks.indexOf(val[1]);
             if (i === -1) {
@@ -84,7 +90,8 @@ var functions = {
         return {
             sites: sites,
             tasks: tasks,
-            data: sorted
+            data: sorted,
+            valid: valid
         };
     },
     calcCompletionTime: function(data) {
@@ -93,6 +100,7 @@ var functions = {
         var sites = analysed.sites;
         var tasks = analysed.tasks;
         var sorted = analysed.data;
+
 
         var completionTimes = {};
         _.each(sorted, function(val, i) {
@@ -119,15 +127,22 @@ var functions = {
 
         return {
             results: completionTimes,
-            tasks: tasks
+            tasks: tasks,
         };
     },
     calcSuccessRate: function(data) {
         var self = this;
         var analysed = this.analyseData(data);
+        var valid = analysed.valid;
         var sites = analysed.sites;
         var tasks = analysed.tasks;
         var sorted = analysed.data;
+
+        if (!valid) {
+            return {
+                valid: false
+            }
+        }
 
         var successRates = {};
         _.each(sorted, function(val, i) {
@@ -151,15 +166,23 @@ var functions = {
 
         return {
             results: successRates,
-            tasks: tasks
+            tasks: tasks,
+            valid: valid
         };
     },
     calcErrorRate: function(data) {
         var self = this;
         var analysed = this.analyseData(data);
+        var valid = analysed.valid;
         var sites = analysed.sites;
         var tasks = analysed.tasks;
         var sorted = analysed.data;
+
+        if (!valid) {
+            return {
+                valid: false
+            }
+        }
 
         var errorRates = {};
         _.each(sorted, function(val, i) {
@@ -183,15 +206,23 @@ var functions = {
 
         return {
             results: errorRates,
-            tasks: tasks
+            tasks: tasks,
+            valid: valid
         };
     },
     calcAverageErrors: function(data) {
         var self = this;
         var analysed = this.analyseData(data);
+        var valid = analysed.valid;
         var sites = analysed.sites;
         var tasks = analysed.tasks;
         var sorted = analysed.data;
+
+        if (!valid) {
+            return {
+                valid: false
+            }
+        }
 
         var averageErrors = {};
         _.each(sorted, function(val, i) {
@@ -218,7 +249,8 @@ var functions = {
 
         return {
             results: averageErrors,
-            tasks: tasks
+            tasks: tasks,
+            valid: valid
         };
     },
     calcFMeasure: function(data) {
